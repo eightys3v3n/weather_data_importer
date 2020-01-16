@@ -107,12 +107,17 @@ def create_tables(db, tables):
         cursor.execute(table)
 
 
-def main():
+def init():
     data = read_config(CONFIG_PATH)
     sql_conf = data['sql']
 
     db = open_db(sql_conf)
     create_tables(db, TABLES)
+    return db
+
+
+def main():
+    init()
 
 
 if __name__ == '__main__':
