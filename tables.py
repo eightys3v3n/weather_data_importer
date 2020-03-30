@@ -3,6 +3,7 @@ import json
 
 
 TABLES = (
+"""CREATE DATABASE IF NOT EXISTS daily_weather""",
 """CREATE TABLE IF NOT EXISTS
 daily_weather.tempurature(
     date        DATE NOT NULL,
@@ -80,7 +81,47 @@ daily_weather.precipitation(
     snow_on_ground  FLOAT,
     PRIMARY KEY (date, location)
 )
-"""
+""",
+
+
+"""CREATE DATABASE IF NOT EXISTS hourly_weather""",
+"""CREATE TABLE IF NOT EXISTS
+hourly_weather.tempurature(
+    datetime    DATETIME NOT NULL,
+    location    VARCHAR(64) NOT NULL,
+    min         FLOAT,
+    max         FLOAT,
+    avg_hourly  FLOAT,
+    PRIMARY KEY (datetime, location)
+)""",
+"""CREATE TABLE IF NOT EXISTS
+hourly_weather.humidity(
+    datetime    DATETIME NOT NULL,
+    location    VARCHAR(64) NOT NULL,
+    min         FLOAT,
+    max         FLOAT,
+    avg_hourly  FLOAT,
+    PRIMARY KEY (datetime, location)
+)""",
+"""CREATE TABLE IF NOT EXISTS
+hourly_weather.wind(
+    datetime    DATETIME NOT NULL,
+    location    VARCHAR(64) NOT NULL,
+    min         FLOAT,
+    max         FLOAT,
+    avg_hourly  FLOAT,
+    max_gust    FLOAT,
+    gust_length FLOAT,
+    PRIMARY KEY (datetime, location)
+)""",
+"""CREATE TABLE IF NOT EXISTS
+hourly_weather.pressure(
+    datetime  DATETIME NOT NULL,
+    location  VARCHAR(64) NOT NULL,
+    station   FLOAT,
+    sea_level FLOAT,
+    PRIMARY KEY (datetime, location)
+)"""
 )
 DATE_FORMAT = "%Y-%m-%d"
 TIME_FORMAT = "%H:%M:%S"
@@ -101,10 +142,14 @@ def open_db(sql_conf):
     return database
 
 
-def create_tables(db, tables):
+def execute(db, statements):
     cursor = db.cursor()
-    for table in tables:
-        cursor.execute(table)
+    for s in statements:
+        try:
+            cursor.execute(s)
+        except Exception as e:
+            print(s)
+            print(e)
 
 
 def init():
@@ -112,7 +157,7 @@ def init():
     sql_conf = data['sql']
 
     db = open_db(sql_conf)
-    create_tables(db, TABLES)
+    execute(db, TABLES)
     return db
 
 
