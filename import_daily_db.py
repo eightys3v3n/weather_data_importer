@@ -9,46 +9,20 @@ import time
 import itertools
 from collections import defaultdict
 from enum import Enum
+from database_helpers import db_execute_many
 
 # All defined in main
-global database
 global LOCATION
 global logger 
-global WEATHER_CSV
 
 
 class Field(Enum):
     Temps = "temperature"
 
 
-def db_execute(cmd, data=None):
-    cursor = database.cursor()
-    logger.debug("SQL command: {}\n\t\tSQL data: {}".format(cmd, data))
-    try:
-        if data is not None:
-            cursor.execute(cmd, data)
-        else:
-            cursor.execute(cmd)
-    except SQLErrors.IntegrityError as e:
-        if not e.__str__().startswith("1062 (23000): Duplicate entry"):
-            raise e
-    return cursor
-
-
-def db_execute_many(cmd, data):
-    cursor = database.cursor()
-    logger.debug("SQL command: {}\n\t\tSQL data: {}".format(cmd, data))
-    try:
-        cursor.executemany(cmd, data)
-    except SQLErrors.IntegrityError as e:
-        if not e.__str__().startswith("1062 (23000): Duplicate entry"):
-            raise e
-    return cursor
-
-
-
-def import_data(rows):
-    db_execute_many("INSERT INTO tempurature(date, location, min, max, avg_hourly, windchill) VALUES(%s, %s, %s, %s, %s, %s)",
+def import_data(database, rows):
+    db_execute_many(database,
+                    "INSERT INTO daily_temp(date, location, min, max, avg_hourly, windchill) VALUES(%s, %s, %s, %s, %s, %s)",
             rows[Field.Temps])
 
 
@@ -133,33 +107,27 @@ def get_lines(path):
     return total_lines
 
 
+def import_daily(database, csv_path):
+    in_file = open(csv_path, "r")
+    csv_reader = csv.DictReader(in_file)
+    
+    start = time.time()
+
+    import_rows(csv_reader, get_lines(csv_path), 1024)
+
+    end = time.time()
+    print("Daily import took", end-start, "seconds")
+
+
 def main():
-    global LOCATION, database, logger, WEATHER_CSV
+    global LOCATION, logger
     LOCATION = "Canada, Alberta, Calgary"
-    WEATHER_CSV = "weatherstats_calgary_daily.csv"
 
     setup_logger()
 
     database = tables.init()
-    in_file = open(WEATHER_CSV, "r")
-    csv_reader = csv.DictReader(in_file)
-
-    row_length = None # The number of elements in every CSV row. Determined by the header.
+    import_daily(database, "weatherstats_calgary_daily.csv")
     
-    start = time.time()
-    import_rows(csv_reader, get_lines(WEATHER_CSV), 1024)
-#    for i, row in progressbar.progressbar(enumerate(csv_reader), max_value=get_lines(WEATHER_CSV)):
-#        if i == 0:
-#            row_length = len(row)
-#            continue
-#            
-#        if len(row) != row_length:
-#            logger.warning("Row is invalid length, ({}): {}".format(len(row), row))
-#            continue
-#        
-#        import_row(row)
-    end = time.time()
-    print("Length:", end-start, "seconds")
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ import json
 
 TABLES = (
 """CREATE TABLE IF NOT EXISTS
-tempurature(
+daily_weather.tempurature(
     date        DATE NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
@@ -15,7 +15,7 @@ tempurature(
 )
 """,
 """CREATE TABLE IF NOT EXISTS
-forecast(
+daily_weather.forecast(
     date        DATE NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min_high    FLOAT,
@@ -26,7 +26,7 @@ forecast(
 )
 """,
 """CREATE TABLE IF NOT EXISTS
-sun(
+daily_weather.sun(
     date            DATE NOT NULL,
     location        VARCHAR(64) NOT NULL,
     sunrise         TIME,
@@ -37,7 +37,7 @@ sun(
 )
 """,
 """CREATE TABLE IF NOT EXISTS
-humidity(
+daily_weather.humidity(
     date        DATE NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
@@ -47,7 +47,7 @@ humidity(
 )
 """,
 """CREATE TABLE IF NOT EXISTS
-wind(
+daily_weather.wind(
     date        DATE NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
@@ -59,7 +59,7 @@ wind(
 )
 """,
 """CREATE TABLE IF NOT EXISTS
-pressure(
+daily_weather.pressure(
     date                DATE NOT NULL,
     location            VARCHAR(64) NOT NULL,
     max_station         FLOAT,
@@ -71,7 +71,7 @@ pressure(
 )
 """,
 """CREATE TABLE IF NOT EXISTS
-precipitation(
+daily_weather.precipitation(
     date            DATE NOT NULL,
     location        VARCHAR(64),
     precipitation   FLOAT,
@@ -95,9 +95,9 @@ def read_config(path):
 def open_db(sql_conf):
     user = sql_conf['user']
     passwd = sql_conf['password']
-    db = sql_conf['database']
+    #db = sql_conf['database']
 
-    database = mysql.connector.connect(host="127.0.0.1", user=user, passwd=passwd, database=db, autocommit=True)
+    database = mysql.connector.connect(host="127.0.0.1", user=user, passwd=passwd, autocommit=True)
     return database
 
 
