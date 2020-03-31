@@ -2,3 +2,5 @@ secrets.json
 start.sh
 *.txt
 __pycache__
+*~
+\#*#

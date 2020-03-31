@@ -1,11 +1,12 @@
 import mysql.connector
 import json
+import logging
 
 
 TABLES = (
 """CREATE DATABASE IF NOT EXISTS daily_weather""",
 """CREATE TABLE IF NOT EXISTS
-daily_weather.tempurature(
+daily_weather.temperature(
     date        DATE NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
@@ -86,7 +87,7 @@ daily_weather.precipitation(
 
 """CREATE DATABASE IF NOT EXISTS hourly_weather""",
 """CREATE TABLE IF NOT EXISTS
-hourly_weather.tempurature(
+hourly_weather.temperature(
     datetime    DATETIME NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
@@ -142,14 +143,29 @@ def open_db(sql_conf):
     return database
 
 
-def execute(db, statements):
+def execute(db, cmd, data=None):
     cursor = db.cursor()
-    for s in statements:
-        try:
-            cursor.execute(s)
-        except Exception as e:
-            print(s)
-            print(e)
+    logging.debug("SQL command: {}\n\t\tSQL data: {}".format(cmd, data))
+    try:
+        if data is not None:
+            cursor.execute(cmd, data)
+        else:
+            cursor.execute(cmd)
+    except mysql.connector.errors.IntegrityError as e:
+        if not e.__str__().startswith("1062 (23000): Duplicate entry"):
+            raise e
+    return cursor
+
+
+def execute_many(db, cmd, data):
+    cursor = db.cursor()
+    logging.debug("SQL command: {}\n\t\tSQL data: {}".format(cmd, data))
+    try:
+        cursor.executemany(cmd, data)
+    except mysql.connector.errors.IntegrityError as e:
+        if not e.__str__().startswith("1062 (23000): Duplicate entry"):
+            raise e
+    return cursor
 
 
 def init():
@@ -157,7 +173,8 @@ def init():
     sql_conf = data['sql']
 
     db = open_db(sql_conf)
-    execute(db, TABLES)
+    for table in TABLES:
+        execute(db, table)
     return db
 
 
