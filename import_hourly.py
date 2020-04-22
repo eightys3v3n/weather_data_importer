@@ -12,7 +12,7 @@ from db_helpers import init, execute_many
 
 
 # SQL statement to execute to import a chunk of values
-IMPORT_MANY_SQL = "INSERT INTO daily_weather.temperature(year, month, day, location, min, max, avg_hourly, windchill) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)"
+IMPORT_MANY_SQL = "INSERT INTO daily_weather.temperature(date, location, min, max, avg_hourly, windchill) VALUES(%s, %s, %s, %s, %s, %s)"
 
 # Rename columns with names equal to key to value.
 # This will overwrite columns, so be careful.
@@ -44,16 +44,13 @@ def parse_row(row):
             n_row[k] = v
 
     if n_row['date'] is None:
-        logging.warning("Empty date: '{}'".format(n_row))
+        logging.warning("Empty date: '{}'".format(row))
         return None
     try:
-        n_row['year'] = datetime.strptime(n_row['date'], '%Y-%m-%d').date().year
-        n_row['month'] = datetime.strptime(n_row['date'], '%Y-%m-%d').date().month
-        n_row['day'] = datetime.strptime(n_row['date'], '%Y-%m-%d').date().day
+        n_row['date'] = datetime.strptime(n_row['date'], '%Y-%m-%d').date()
     except ValueError as e:
         logging.warning("Failed to parse date, '{}' {}".format(e, n_row['date']))
         return None
-    del n_row['date']
 
     if n_row['min'] is not None:
         try:

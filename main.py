@@ -21,7 +21,7 @@ def restructure(data):
     n_data = []
     
     for r in data:
-        n_data.append((r['date'], r['location'], r['min'], r['max'], r['avg_hourly'], r['windchill']
+        n_data.append((r['year'], r['month'], r['day'], r['location'], r['min'], r['max'], r['avg_hourly'], r['windchill']
             ))
 
     return n_data
@@ -52,7 +52,7 @@ def main():
     
     database = init_db()
     import_file(database, "weatherstats_calgary_daily.csv", import_daily, location="Calgary, AB, Canada")
-    import_file(database, "weatherstats_calgary_hourly.csv", import_hourly, location="Calgary, AB, Canada")
+    #import_file(database, "weatherstats_calgary_hourly.csv", import_hourly, location="Calgary, AB, Canada")
 
 
 if __name__ == '__main__':

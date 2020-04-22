@@ -7,62 +7,74 @@ TABLES = (
 """CREATE DATABASE IF NOT EXISTS daily_weather""",
 """CREATE TABLE IF NOT EXISTS
 daily_weather.temperature(
-    date        DATE NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
     max         FLOAT,
     avg_hourly  FLOAT,
     windchill   FLOAT,
-    PRIMARY KEY (date, location)
+    PRIMARY KEY (year, month, day, location)
 )
 """,
 """CREATE TABLE IF NOT EXISTS
 daily_weather.forecast(
-    date        DATE NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min_high    FLOAT,
     max_high    FLOAT,
     min_low     FLOAT,
     max_low     FLOAT,
-    PRIMARY KEY (date, location)
+    PRIMARY KEY (year, month, day, location)
 )
 """,
 """CREATE TABLE IF NOT EXISTS
 daily_weather.sun(
-    date            DATE NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
     location        VARCHAR(64) NOT NULL,
     sunrise         TIME,
     sunset          TIME,
     hours_of_light  FLOAT,
     radiation       FLOAT,
-    PRIMARY KEY (date, location)
+    PRIMARY KEY (year, month, day, location)
 )
 """,
 """CREATE TABLE IF NOT EXISTS
 daily_weather.humidity(
-    date        DATE NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
     max         FLOAT,
     avg_hourly  FLOAT,
-    PRIMARY KEY (date, location)
+    PRIMARY KEY (year, month, day, location)
 )
 """,
 """CREATE TABLE IF NOT EXISTS
 daily_weather.wind(
-    date        DATE NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
     max         FLOAT,
     avg_hourly  FLOAT,
     max_gust    FLOAT,
     gust_length FLOAT,
-    PRIMARY KEY (date, location)
+    PRIMARY KEY (year, month, day, location)
 )
 """,
 """CREATE TABLE IF NOT EXISTS
 daily_weather.pressure(
-    date                DATE NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
     location            VARCHAR(64) NOT NULL,
     max_station         FLOAT,
     min_station         FLOAT,
@@ -74,13 +86,15 @@ daily_weather.pressure(
 """,
 """CREATE TABLE IF NOT EXISTS
 daily_weather.precipitation(
-    date            DATE NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
     location        VARCHAR(64),
     precipitation   FLOAT,
     rain            FLOAT,
     snow            FLOAT,
     snow_on_ground  FLOAT,
-    PRIMARY KEY (date, location)
+    PRIMARY KEY (year, month, day, location)
 )
 """,
 
@@ -88,40 +102,60 @@ daily_weather.precipitation(
 """CREATE DATABASE IF NOT EXISTS hourly_weather""",
 """CREATE TABLE IF NOT EXISTS
 hourly_weather.temperature(
-    datetime    DATETIME NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
+    hour        INT NOT NULL,
+    minute      INT NOT NULL,
+    second      FLOAT NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
     max         FLOAT,
     avg_hourly  FLOAT,
-    PRIMARY KEY (datetime, location)
+    PRIMARY KEY (year, month, day, hour, minute, second, location)
 )""",
 """CREATE TABLE IF NOT EXISTS
 hourly_weather.humidity(
-    datetime    DATETIME NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
+    hour        INT NOT NULL,
+    minute      INT NOT NULL,
+    second      FLOAT NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
     max         FLOAT,
     avg_hourly  FLOAT,
-    PRIMARY KEY (datetime, location)
+    PRIMARY KEY (year, month, day, hour, minute, second, location)
 )""",
 """CREATE TABLE IF NOT EXISTS
 hourly_weather.wind(
-    datetime    DATETIME NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
+    hour        INT NOT NULL,
+    minute      INT NOT NULL,
+    second      FLOAT NOT NULL,
     location    VARCHAR(64) NOT NULL,
     min         FLOAT,
     max         FLOAT,
     avg_hourly  FLOAT,
     max_gust    FLOAT,
     gust_length FLOAT,
-    PRIMARY KEY (datetime, location)
+    PRIMARY KEY (year, month, day, hour, minute, second, location)
 )""",
 """CREATE TABLE IF NOT EXISTS
 hourly_weather.pressure(
-    datetime  DATETIME NOT NULL,
+    year        INT NOT NULL,
+    month       INT NOT NULL,
+    day         INT NOT NULL,
+    hour        INT NOT NULL,
+    minute      INT NOT NULL,
+    second      FLOAT NOT NULL,
     location  VARCHAR(64) NOT NULL,
     station   FLOAT,
     sea_level FLOAT,
-    PRIMARY KEY (datetime, location)
+    PRIMARY KEY (year, month, day, hour, minute, second, location)
 )"""
 )
 DATE_FORMAT = "%Y-%m-%d"
