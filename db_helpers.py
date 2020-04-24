@@ -3,6 +3,8 @@ import json
 import logging
 
 
+SQL_PARAM_CHAR = "%s"
+
 TABLES = (
 """CREATE DATABASE IF NOT EXISTS daily_weather""",
 """CREATE TABLE IF NOT EXISTS
@@ -193,7 +195,17 @@ def execute(db, cmd, data=None):
 
 def execute_many(db, cmd, data):
     cursor = db.cursor()
-    logging.debug("SQL command: {}\n\t\tSQL data: {}".format(cmd, data))
+
+    n_data = []
+    size = cmd.count(SQL_PARAM_CHAR)
+    for d in data:
+        if len(d) == size:
+            n_data.append(d)
+        else:
+            logging.warning("Ignoring invalid data, expected len {}, got len {}: {}".format(size, len(d), d))
+    data = n_data
+    
+    logging.debug("SQL command: {}\n\t\tSQL data: {}...".format(cmd, data[0:1]))
     try:
         cursor.executemany(cmd, data)
     except mysql.connector.errors.IntegrityError as e:

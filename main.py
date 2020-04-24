@@ -1,5 +1,5 @@
 from db_helpers import init as init_db
-from db_helpers import execute_many
+from db_helpers import execute_many, SQL_PARAM_CHAR
 from helpers import csv_file, grouper, line_count
 from collections import defaultdict
 import logging
@@ -17,13 +17,16 @@ def parse_rows(data, module):
     return n_data
 
 
-def restructure(data):
-    n_data = []
+def restructure(data, module):
+    n_data = {}
     
-    for r in data:
-        n_data.append((r['year'], r['month'], r['day'], r['location'], r['min'], r['max'], r['avg_hourly'], r['windchill']
-            ))
-
+    for table in module.Tables:
+        n_data[table] = []
+        for r in data:
+            n_data[table].append([])
+            for col in module.IMPORT_MANY_SQL[table]['fields']:
+                n_data[table][-1].append(r[col])
+                
     return n_data
 
 def set_location(data, loc):
@@ -36,14 +39,23 @@ def import_chunk(database, data, module, location=None):
     data = parse_rows(data, module)
     if location is not None:
         set_location(data, "Canada, Alberta, Calgary")
-    data = restructure(data)
-    execute_many(database, module.IMPORT_MANY_SQL, data)
+
+    data = restructure(data, module)
+
+    for table, specs in module.IMPORT_MANY_SQL.items():
+        
+        statement = "INSERT INTO {}({}) VALUES({})".format(
+            specs['table'],
+            ','.join(specs['fields']),
+            ','.join([SQL_PARAM_CHAR] * len(specs['fields']))
+        )
+        execute_many(database, statement, data[table])
 
     
-def import_file(database, path, module, location=None, chunk_size=1024):
+def import_file(database, path, module, location=None, chunk_size=256):
     reader = csv_file(path, fields=module.FIELD_NAMES)
 
-    for chunk in progressbar.progressbar(grouper(reader, chunk_size), max_value=line_count(path)/chunk_size):
+    for chunk in progressbar.progressbar(grouper(reader, chunk_size), max_value=line_count(path)//chunk_size):
         import_chunk(database, chunk, module, location=location)
                         
 

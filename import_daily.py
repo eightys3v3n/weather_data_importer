@@ -11,16 +11,29 @@ from enum import Enum
 from db_helpers import init, execute_many
 
 
+class Tables(Enum):
+    Temperature = "temperature"
+    Precipitation = "precipitation"
+
 # SQL statement to execute to import a chunk of values
-IMPORT_MANY_SQL = "INSERT INTO daily_weather.temperature(year, month, day, location, min, max, avg_hourly, windchill) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)"
+IMPORT_MANY_SQL = {
+    Tables.Temperature: {
+        'table': "daily_weather.temperature",
+        'fields': ['year', 'month', 'day', 'location', 'min', 'max', 'avg_hourly', 'windchill']
+    },
+    Tables.Precipitation: {
+        'table': "daily_weather.precipitation",
+        'fields': ['year', 'month', 'day', 'location', 'precipitation', 'rain', 'snow', 'snow_on_ground']
+    },
+}
 
 # Rename columns with names equal to key to value.
 # This will overwrite columns, so be careful.
 COLUMN_ALIASES = {'min_temperature': 'min',
-               'max_temperature': 'max',
-               'avg_hourly_temperature': 'avg_hourly',
-               'min_windchill': 'windchill',
-               }
+                  'max_temperature': 'max',
+                  'avg_hourly_temperature': 'avg_hourly',
+                  'min_windchill': 'windchill',
+}
 FIELD_NAMES = ['date','max_temperature','avg_hourly_temperature','avg_temperature','min_temperature','max_humidex','min_windchill','max_relative_humidity','avg_hourly_relative_humidity','avg_relative_humidity','min_relative_humidity','max_dew_point','avg_hourly_dew_point','avg_dew_point','min_dew_point','max_wind_speed','avg_hourly_wind_speed','avg_wind_speed','min_wind_speed','max_wind_gust','wind_gust_dir_10s','max_pressure_sea','avg_hourly_pressure_sea','avg_pressure_sea','min_pressure_sea','max_pressure_station','avg_hourly_pressure_station','avg_pressure_station','min_pressure_station','max_visibility','avg_hourly_visibility','avg_visibility','min_visibility','max_health_index','avg_hourly_health_index','avg_health_index','min_health_index','heatdegdays','cooldegdays','growdegdays_5','growdegdays_7','growdegdays_10','precipitation','rain','snow','snow_on_ground','sunrise','sunset','sunlight','sunrise_f','sunset_f','min_uv_forecast','max_uv_forecast','min_high_temperature_forecast','max_high_temperature_forecast','min_low_temperature_forecast','max_low_temperature_forecast','solar_radiation','max_cloud_cover_4','avg_hourly_cloud_cover_4','avg_cloud_cover_4','min_cloud_cover_4','max_cloud_cover_8','avg_hourly_cloud_cover_8','avg_cloud_cover_8','min_cloud_cover_8','max_cloud_cover_10','avg_hourly_cloud_cover_10','avg_cloud_cover_10','min_cloud_cover_10']
 LOCATION = "Calgary, AB, Canada"
 
